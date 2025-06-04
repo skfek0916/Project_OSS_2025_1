@@ -13,7 +13,6 @@ class Budget:
 
     def add_transport_expense(self):
         today = datetime.date.today().isoformat()
-        # K패스 교통카드 여부 선택
         sub_choice = input("1. K패스 교통카드 / 2. 기타 교통수단 > ")
 
         try:
@@ -23,7 +22,6 @@ class Budget:
             return
 
         if sub_choice == "1":
-            # K패스 교통카드 사용자 타입 선택
             print("1. 일반인 (20% 할인) / 2. 청소년층 (30% 할인) / 3. 저소득층 (53% 할인)")
             user_type = input("사용자 유형 선택 > ")
 
@@ -56,11 +54,47 @@ class Budget:
             print("지출 내역이 없습니다.\n")
             return
         print("\n[지출 목록]")
+        total = sum(e.amount for e in self.expenses)
+        category_sums = {}
+        for e in self.expenses:
+            category_sums[e.category] = category_sums.get(e.category, 0) + e.amount
         for idx, e in enumerate(self.expenses, 1):
             print(f"{idx}. {e}")
+        print()
+        print("[카테고리별 지출 비율]")
+        for cat, amt in category_sums.items():
+            percent = (amt / total) * 100 if total > 0 else 0
+            print(f"- {cat}: {amt}원 ({percent:.1f}%)")
         print()
 
     def total_spent(self):
         total = sum(e.amount for e in self.expenses)
         print(f"총 지출: {total}원\n")
 
+    def daily_check(self):
+        print("=== 하루 점검 ===")
+        try:
+            daily_goal = int(input("오늘 하루 지출 목표(원)를 입력하세요: "))
+        except ValueError:
+            print("잘못된 금액입니다.\n")
+            return
+        total_today = 0
+        while True:
+            desc = input("지출 항목 설명 (종료하려면 'q' 입력): ")
+            if desc.lower() == 'q':
+                break
+            try:
+                amt = int(input("금액(원): "))
+            except ValueError:
+                print("잘못된 금액입니다. 다시 입력해주세요.\n")
+                continue
+            total_today += amt
+            today_date = datetime.date.today().isoformat()
+            self.expenses.append(Expense(today_date, "하루 점검", desc, amt))
+            print(f"현재까지 오늘 지출 합계: {total_today}원")
+        print(f"오늘 최종 지출 합계: {total_today}원 (목표: {daily_goal}원)")
+        if total_today > daily_goal:
+            print("주의: 오늘 목표 지출을 초과했어요. 지출을 줄여보세요!")
+        else:
+            print("잘했어요! 오늘 목표 이내로 지출했어요! 🎉")
+        print()
