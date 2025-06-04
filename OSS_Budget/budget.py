@@ -23,10 +23,28 @@ class Budget:
             return
 
         if sub_choice == "1":
-            # K패스 교통카드는 20% 할인 적용
-            discounted = int(amount * 0.8)
-            expense = Expense(today, "교통비", "K패스 교통카드", discounted)
-            print(f"할인 전 금액: {amount}원, 할인 후 저장된 금액: {discounted}원")
+            # K패스 교통카드 사용자 타입 선택
+            print("1. 일반인 (20% 할인) / 2. 청소년층 (30% 할인) / 3. 저소득층 (53% 할인)")
+            user_type = input("사용자 유형 선택 > ")
+
+            if user_type == "1":
+                rate = 0.8
+                type_desc = "일반인"
+            elif user_type == "2":
+                rate = 0.7
+                type_desc = "청소년층"
+            elif user_type == "3":
+                rate = 0.47
+                type_desc = "저소득층"
+            else:
+                print("잘못된 선택입니다. 일반인 기준 할인 적용합니다.")
+                rate = 0.8
+                type_desc = "일반인"
+
+            discounted = int(amount * rate)
+            description = f"K패스 교통카드 ({type_desc})"
+            expense = Expense(today, "교통비", description, discounted)
+            print(f"할인 전 금액: {amount}원, 할인율: {(1-rate)*100:.0f}%, 할인 후 저장된 금액: {discounted}원")
         else:
             expense = Expense(today, "교통비", "기타 교통수단", amount)
 
@@ -45,3 +63,4 @@ class Budget:
     def total_spent(self):
         total = sum(e.amount for e in self.expenses)
         print(f"총 지출: {total}원\n")
+
